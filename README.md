@@ -1,5 +1,7 @@
 # monitarr
 
+![image](https://github.com/user-attachments/assets/a336edca-ab09-43f3-9ed2-d0f218881fd0)
+
 An extremely simple download monitoring tool for Sonarr and Radarr.
 
 I wanted a simple way for other users who made requests using Overseerr/Jellyseerr to see the download progress of their requests without giving them access to the Sonarr/Radarr web interface, or asking me for updates. This tool does not have any authentication (!) so make sure you run it in a secure environment.
