@@ -1,0 +1,13 @@
+services:
+  monitarr:
+    container_name: monitarr
+    ports:
+      - 3000:3000
+    build: .
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+      - ./:/code
