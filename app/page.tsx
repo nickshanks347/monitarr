@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Download, Film, Moon, Sun, Tv, RefreshCw } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Download, Film, Moon, Sun, Tv, RefreshCw, Clock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { DownloadType } from '@/types/Download'
 
@@ -44,35 +45,77 @@ const DownloadItem = ({ download }: { download: DownloadType }) => (
 export default function DownloadDashboard() {
   const [sonarrDownloads, setSonarrDownloads] = useState<DownloadType[]>([])
   const [radarrDownloads, setRadarrDownloads] = useState<DownloadType[]>([])
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number | null>(null)
+  const [isAutoRefreshing, setIsAutoRefreshing] = useState(false)
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
-  const refreshDownloads = (type: 'sonarr' | 'radarr') => {
-    if (type === 'sonarr') {
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const refreshDownloads = useCallback((type: 'sonarr' | 'radarr' | 'both') => {
+    if (type === 'sonarr' || type === 'both') {
       triggerQueueRefresh('/api/sonarr/downloads/refresh').catch(console.error)
       fetchDownloads('/api/sonarr/downloads').then(setSonarrDownloads).catch(console.error)
-    } else if (type === 'radarr') {
+    }
+    if (type === 'radarr' || type === 'both') {
       triggerQueueRefresh('/api/radarr/downloads/refresh').catch(console.error)
       fetchDownloads('/api/radarr/downloads').then(setRadarrDownloads).catch(console.error)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchDownloads('/api/sonarr/downloads').then(setSonarrDownloads).catch(console.error)
-    fetchDownloads('/api/radarr/downloads').then(setRadarrDownloads).catch(console.error)
-  }, [])
+    refreshDownloads('both')
+  }, [refreshDownloads])
+
+  useEffect(() => {
+    if (autoRefreshInterval) {
+      setIsAutoRefreshing(true)
+      const intervalId = setInterval(() => refreshDownloads('both'), autoRefreshInterval * 1000)
+      return () => {
+        clearInterval(intervalId)
+        setIsAutoRefreshing(false)
+      }
+    }
+  }, [autoRefreshInterval, refreshDownloads])
+
+  const handleAutoRefreshChange = (value: string) => {
+    const interval = parseInt(value, 10)
+    setAutoRefreshInterval(interval || null)
+  }
+
+  if (!mounted) {
+    return null
+  }
 
   return (
     <div className="container mx-auto p-4 min-h-screen bg-background text-foreground">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">monitarr</h1>
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          {theme === 'dark' ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
-        </Button>
+        <div className="flex items-center space-x-4">
+          <Select onValueChange={handleAutoRefreshChange} value={autoRefreshInterval?.toString() || ''}>
+            <SelectTrigger className={`w-[180px] ${isAutoRefreshing ? 'border-primary' : ''}`}>
+              <SelectValue placeholder="Auto-refresh" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="disabled">Disabled</SelectItem>
+              <SelectItem value="5">Every 5 seconds</SelectItem>
+              <SelectItem value="15">Every 15 seconds</SelectItem>
+              <SelectItem value="30">Every 30 seconds</SelectItem>
+              <SelectItem value="60">Every 1 minute</SelectItem>
+              <SelectItem value="300">Every 5 minutes</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
+          </Button>
+        </div>
       </div>
       <Tabs defaultValue="sonarr">
         <TabsList className="grid w-full grid-cols-2">
@@ -93,9 +136,14 @@ export default function DownloadDashboard() {
                   <Download className="mr-2 h-5 w-5" />
                   Sonarr Downloads
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => refreshDownloads('sonarr')}>
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-2">
+                  {isAutoRefreshing && (
+                    <Clock className="h-4 w-4 text-primary animate-pulse" />
+                  )}
+                  <Button variant="ghost" size="sm" onClick={() => refreshDownloads('sonarr')} disabled={isAutoRefreshing}>
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -117,9 +165,14 @@ export default function DownloadDashboard() {
                   <Download className="mr-2 h-5 w-5" />
                   Radarr Downloads
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => refreshDownloads('radarr')}>
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-2">
+                  {isAutoRefreshing && (
+                    <Clock className="h-4 w-4 text-primary animate-pulse" />
+                  )}
+                  <Button variant="ghost" size="sm" onClick={() => refreshDownloads('radarr')} disabled={isAutoRefreshing}>
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
