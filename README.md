@@ -33,7 +33,24 @@ The logic for the download speed is extremely inaccurate.
 
 ## Docker
 
-I haven't created a Dockerfile yet but it is on the list.
+A Docker image is available at `ghcr.io/nickshanks347/monitarr:latest`. You can use Docker compose to run it:
+
+```yaml
+services:
+  monitarr:
+    container_name: monitarr
+    image: ghcr.io/nickshanks347/monitarr:latest
+    ports:
+      - 3000:3000
+    environment:
+      - SONARR_URL=http://sonarr:8989
+      - SONARR_API_KEY=YOUR_SONARR_API_KEY
+      - RADARR_URL=http://radarr:7878
+      - RADARR_API_KEY=YOUR_RADARR_API_KEY
+    restart: unless-stopped
+```
+
+If you would like to build locally, feel free to use the Dockerfile or the `compose-build.yml` file located in the `.docker` directory.
 
 ## Contributing
 
