@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Film, Moon, Sun, Tv, RefreshCw, Clock } from 'lucide-react'
+import { Download, Film, Moon, Sun, Tv, RefreshCw, Clock, ArrowUp, ArrowDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { DownloadType } from '@/types/Download'
 
@@ -47,6 +47,8 @@ export default function DownloadDashboard() {
   const [radarrDownloads, setRadarrDownloads] = useState<DownloadType[]>([])
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<number | null>(null)
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(false)
+  const [sortCriteria, setSortCriteria] = useState('title')
+  const [isSortAscending, setIsSortAscending] = useState(true)
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -85,6 +87,30 @@ export default function DownloadDashboard() {
     setAutoRefreshInterval(interval || null)
   }
 
+  const handleSortChange = (value: string) => {
+    setSortCriteria(value)
+  }
+
+  const toggleSortOrder = () => {
+    setIsSortAscending(!isSortAscending)
+  }
+
+  const sortDownloads = (downloads: DownloadType[]) => {
+    return [...downloads].sort((a, b) => {
+      let comparison = 0
+      if (sortCriteria === 'title') {
+        comparison = a.title.localeCompare(b.title)
+      } else if (sortCriteria === 'size') {
+        comparison = parseFloat(a.size) - parseFloat(b.size)
+      } else if (sortCriteria === 'timeRemaining') {
+        comparison = parseFloat(a.timeRemaining) - parseFloat(b.timeRemaining)
+      } else if (sortCriteria === 'progress') {
+        comparison = a.progress - b.progress
+      }
+      return isSortAscending ? comparison : -comparison
+    })
+  }
+
   if (!mounted) {
     return null
   }
@@ -107,6 +133,20 @@ export default function DownloadDashboard() {
               <SelectItem value="300">Every 5 minutes</SelectItem>
             </SelectContent>
           </Select>
+          <Select onValueChange={handleSortChange} value={sortCriteria}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="size">Size</SelectItem>
+              <SelectItem value="timeRemaining">Time Remaining</SelectItem>
+              <SelectItem value="progress">Progress</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="icon" onClick={toggleSortOrder} aria-label="Toggle sort order">
+            {isSortAscending ? <ArrowUp className="h-[1.2rem] w-[1.2rem]" /> : <ArrowDown className="h-[1.2rem] w-[1.2rem]" />}
+          </Button>
           <Button 
             variant="outline" 
             size="icon" 
@@ -150,7 +190,7 @@ export default function DownloadDashboard() {
               {sonarrDownloads.length === 0 ? (
                 <p className="text-center text-muted-foreground">No active downloads</p>
               ) : (
-                sonarrDownloads.map(download => (
+                sortDownloads(sonarrDownloads).map(download => (
                   <DownloadItem key={download.id} download={download} />
                 ))
               )}
@@ -179,7 +219,7 @@ export default function DownloadDashboard() {
               {radarrDownloads.length === 0 ? (
                 <p className="text-center text-muted-foreground">No active downloads</p>
               ) : (
-                radarrDownloads.map(download => (
+                sortDownloads(radarrDownloads).map(download => (
                   <DownloadItem key={download.id} download={download} />
                 ))
               )}
