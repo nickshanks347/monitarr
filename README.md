@@ -25,7 +25,10 @@ The logic for the download speed is extremely inaccurate.
     SONARR_API_KEY=your-sonarr-api-key
     RADARR_URL=http://localhost:7878
     RADARR_API_KEY=your-radarr-api-key
+    BASE_PATH=
     ```
+
+    **Optional**: Set `BASE_PATH` to host monitarr on a subfolder (e.g., `BASE_PATH=/monitarr` to access at `http://localhost:3000/monitarr`). This is useful for reverse proxy setups where you want to host monitarr at `yourdomain.com/monitarr` instead of a subdomain.
 
 4. Run `yarn build`
 5. Run `yarn start`
@@ -47,6 +50,7 @@ services:
       - SONARR_API_KEY=YOUR_SONARR_API_KEY
       - RADARR_URL=http://radarr:7878
       - RADARR_API_KEY=YOUR_RADARR_API_KEY
+      - BASE_PATH=/monitarr  # Optional: for subfolder hosting
     restart: unless-stopped
 ```
 
