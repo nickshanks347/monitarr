@@ -12,4 +12,5 @@ services:
       - SONARR_API_KEY=YOUR_SONARR_API_KEY
       - RADARR_URL=http://radarr:7878
       - RADARR_API_KEY=YOUR_RADARR_API_KEY
+      - BASE_PATH=/monitarr  # Test subfolder hosting
     restart: unless-stopped
