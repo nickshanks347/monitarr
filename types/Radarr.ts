@@ -51,6 +51,8 @@ interface RadarrRecord {
   downloadClientHasPostImportCategory: boolean;
   indexer: string;
   id: number;
+  digitalRelease: string;
+  releaseDate: string;
 }
 
 export interface RadarrQueue {
@@ -60,4 +62,12 @@ export interface RadarrQueue {
   sortDirection: string;
   totalRecords: number;
   records: RadarrRecord[];
+}
+
+
+export type RadarrWantedType = {
+  id: number
+  title: string
+  airDate: string;
+  releaseDate: string;
 }

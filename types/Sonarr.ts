@@ -51,6 +51,12 @@ interface SonarrRecord {
   indexer: string;
   episodeHasFile: boolean;
   id: number;
+  episodeNumber: number;
+  airDate: string;
+  series: {
+    id: number;
+    title: string;
+  }
 }
 
 export interface SonarrQueue {
@@ -60,4 +66,32 @@ export interface SonarrQueue {
   sortDirection: string;
   totalRecords: number;
   records: SonarrRecord[];
+}
+
+export type SonarrWantedType = {
+  id: number
+  seriesId: number
+  airDate: string;
+  seriesTitle: string;
+  title: string
+}
+
+interface WikiUrl {
+  fullUri: string | null;
+  scheme: string | null;
+  host: string | null;
+  port: number | null;
+  path: string | null;
+  query: string | null;
+  fragment: string | null;
+}
+
+export type MessageType = "ok" | "notice" | "warning" | "error";
+
+export interface SonarrHealthItem {
+  id: number;
+  source: string | null;
+  type: MessageType;
+  message: string | null;
+  wikiUrl: WikiUrl;
 }

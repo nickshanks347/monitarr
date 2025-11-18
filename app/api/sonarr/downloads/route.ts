@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { DownloadType } from '@/types/Download';
-import { SonarrQueue } from '@/types/SonarrQueue';
+import { SonarrQueue } from '@/types/Sonarr';
 
 export async function GET() {
   const response = await fetch(`${process.env.SONARR_URL}/api/v3/queue?apikey=${process.env.SONARR_API_KEY}`);
@@ -24,7 +24,7 @@ export async function GET() {
     const fqTitle = `${seriesName} - S${seasonNumber}E${episodeNumber}`;
     const progress = Math.round(100 - (record.sizeleft / record.size * 100));
     const size = `${(record.size / 1024 / 1024 / 1024).toFixed(1)} GB`;
-    
+
     const downloadedSize = record.size - record.sizeleft;
     const addedTime = new Date(record.added).getTime(); // convert added time to milliseconds
     const currentTime = Date.now(); // current time in milliseconds

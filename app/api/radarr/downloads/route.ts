@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { DownloadType } from '@/types/Download';
-import { RadarrQueue } from '@/types/RadarrQueue';
+import { RadarrQueue } from '@/types/Radarr';
 
 export async function GET() {
   const response = await fetch(`${process.env.RADARR_URL}/api/v3/queue?apikey=${process.env.RADARR_API_KEY}`);
@@ -21,7 +21,7 @@ export async function GET() {
     const movieName = movieData.title;
     const progress = Math.round(100 - (record.sizeleft / record.size * 100));
     const size = `${(record.size / 1024 / 1024 / 1024).toFixed(1)} GB`;
-    
+
     const downloadedSize = record.size - record.sizeleft;
     const addedTime = new Date(record.added).getTime(); // convert added time to milliseconds
     const currentTime = Date.now(); // current time in milliseconds
