@@ -4,7 +4,7 @@
 
 An extremely simple download monitoring tool for Sonarr and Radarr.
 
-I wanted a simple way for other users who made requests using Overseerr/Jellyseerr to see the download progress of their requests without giving them access to the Sonarr/Radarr web interface, or asking me for updates. This tool supports optional HTTP Basic Authentication (see below) — make sure you run it in a secure environment or enable authentication if it is accessible outside a trusted network.
+I wanted a simple way for other users who made requests using Overseerr/Jellyseerr to see the download progress of their requests without giving them access to the Sonarr/Radarr web interface, or asking me for updates. This tool does not have any authentication (!) so make sure you run it in a secure environment.
 
 It uses the Sonarr/Radarr APIs to get a summary of the download queue and then serves a simple webpage using Next. There is a refresh button on the page which triggers a refresh job in Sonarr/Radarr and then fetches the latest data again.
 
@@ -26,13 +26,9 @@ The logic for the download speed is extremely inaccurate.
     RADARR_URL=http://localhost:7878
     RADARR_API_KEY=your-radarr-api-key
     BASE_PATH=
-    AUTH_USERNAME=
-    AUTH_PASSWORD=
     ```
 
     **Optional**: Set `BASE_PATH` to host monitarr on a subfolder (e.g., `BASE_PATH=/monitarr` to access at `http://localhost:3000/monitarr`). This is useful for reverse proxy setups where you want to host monitarr at `yourdomain.com/monitarr` instead of a subdomain.
-
-    **Optional**: Set `AUTH_USERNAME` and `AUTH_PASSWORD` to enable HTTP Basic Authentication. When both variables are set, all requests to monitarr will require a username and password. This is strongly recommended if you expose monitarr outside of a trusted local network.
 
 4. Run `yarn build`
 5. Run `yarn start`
@@ -55,8 +51,6 @@ services:
       - RADARR_URL=http://radarr:7878
       - RADARR_API_KEY=YOUR_RADARR_API_KEY
       - BASE_PATH=/monitarr  # Optional: for subfolder hosting
-      - AUTH_USERNAME=your-username  # Optional: enable Basic Auth
-      - AUTH_PASSWORD=your-password  # Optional: enable Basic Auth
     restart: unless-stopped
 ```
 
