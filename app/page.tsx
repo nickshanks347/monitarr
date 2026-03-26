@@ -53,6 +53,7 @@ export default function DownloadDashboard() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 
@@ -73,6 +74,7 @@ export default function DownloadDashboard() {
 
   useEffect(() => {
     if (autoRefreshInterval) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAutoRefreshing(true)
       const intervalId = setInterval(() => refreshDownloads('both'), autoRefreshInterval * 1000)
       return () => {

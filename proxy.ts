@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const basePath = process.env.BASE_PATH || '';
   
   // If no base path is configured, proceed normally
