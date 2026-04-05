@@ -3,7 +3,7 @@ import { DownloadType } from '@/types/Download';
 import { SonarrQueue } from '@/types/SonarrQueue';
 
 export async function GET() {
-  const pageSize = process.env.SONARR_URL ?? 10;
+  const pageSize = process.env.PAGE_SIZE ?? 10;
   const response = await fetch(`${process.env.SONARR_URL}/api/v3/queue?apikey=${process.env.SONARR_API_KEY}&pageSize=${pageSize}`);
   const sonarrData: SonarrQueue = await response.json();
 

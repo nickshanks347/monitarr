@@ -3,7 +3,7 @@ import { DownloadType } from '@/types/Download';
 import { RadarrQueue } from '@/types/RadarrQueue';
 
 export async function GET() {
-  const pageSize = process.env.SONARR_URL ?? 10;
+  const pageSize = process.env.PAGE_SIZE ?? 10;
   const response = await fetch(`${process.env.RADARR_URL}/api/v3/queue?apikey=${process.env.RADARR_API_KEY}&pageSize=${pageSize}`);
   const radarrData: RadarrQueue = await response.json();
 
